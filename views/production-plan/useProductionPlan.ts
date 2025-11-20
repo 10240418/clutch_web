@@ -1,21 +1,15 @@
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import {
     getProductionPlans,
-    deleteProductionPlan,
-    addProductionPlan,
-    updateProductionPlan,
-    getProductModels,
-    getProductionPlansByDateRange
+    importProductionPlan,
 } from '@/httpapis/management';
-import { ProductionPlan, ProductModel } from '@/model/managementModels';
+import { ProductionPlan } from '@/model/managementModels';
 import dayjs from 'dayjs';
 
 export const useProductionPlanData = () => {
     const isLoading = ref(false);
     const data = ref<ProductionPlan[]>([]);
-    const productModels = ref<ProductModel[]>([]);
-    const dailyPlansData = ref<any>({});
     const pagination = ref({
         pageNum: 1,
         pageSize: 10,
@@ -25,40 +19,146 @@ export const useProductionPlanData = () => {
 
     const columns = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: 40,
+            title: '物料编码',
+            dataIndex: 'materialCode',
+            key: 'materialCode',
+            width: 120,
+            fixed: 'left',
         },
         {
-            title: '日期',
-            dataIndex: 'startAt',
-            key: 'startAt',
+            title: '部品号',
+            dataIndex: 'partNumber',
+            key: 'partNumber',
+            width: 150,
+            fixed: 'left',
+        },
+        {
+            title: '直流/交流',
+            dataIndex: 'type',
+            key: 'type',
+            width: 100,
+        },
+        {
+            title: '厂家',
+            dataIndex: 'manufacturer',
+            key: 'manufacturer',
+            width: 150,
+        },
+        {
+            title: '计划输入日期',
+            dataIndex: 'planDate',
+            key: 'planDate',
+            width: 120,
             customRender: ({ text }: { text: string }) => text ? dayjs(text).format('YYYY-MM-DD') : '',
         },
         {
-            title: '归属',
-            dataIndex: 'belongsTo',
-            key: 'belongsTo',
+            title: '生产线体',
+            dataIndex: 'productionLine',
+            key: 'productionLine',
+            width: 120,
         },
         {
-            title: '产品型号',
-            dataIndex: ['productModel', 'description'],
-            key: 'productModel',
+            title: 'T计划数',
+            dataIndex: 'tPlanned',
+            key: 'tPlanned',
+            width: 100,
         },
         {
-            title: '计划',
-            dataIndex: 'planned',
-            key: 'planned',
+            title: 'T完成数',
+            dataIndex: 'tActual',
+            key: 'tActual',
+            width: 100,
         },
         {
-            title: '实际',
-            dataIndex: 'actual',
-            key: 'actual',
+            title: 'T未完成数',
+            dataIndex: 'tUnfinished',
+            key: 'tUnfinished',
+            width: 100,
         },
         {
-            title: '操作',
-            key: 'action',
+            title: 'T1计划数',
+            dataIndex: 't1Planned',
+            key: 't1Planned',
+            width: 100,
+        },
+        {
+            title: 'T1完成数',
+            dataIndex: 't1Actual',
+            key: 't1Actual',
+            width: 100,
+        },
+        {
+            title: 'T1未完成数',
+            dataIndex: 't1Unfinished',
+            key: 't1Unfinished',
+            width: 100,
+        },
+        {
+            title: 'T2计划数',
+            dataIndex: 't2Planned',
+            key: 't2Planned',
+            width: 100,
+        },
+        {
+            title: 'T2完成数',
+            dataIndex: 't2Actual',
+            key: 't2Actual',
+            width: 100,
+        },
+        {
+            title: 'T2未完成数',
+            dataIndex: 't2Unfinished',
+            key: 't2Unfinished',
+            width: 100,
+        },
+        {
+            title: 'T3计划数',
+            dataIndex: 't3Planned',
+            key: 't3Planned',
+            width: 100,
+        },
+        {
+            title: 'T3完成数',
+            dataIndex: 't3Actual',
+            key: 't3Actual',
+            width: 100,
+        },
+        {
+            title: 'T3未完成数',
+            dataIndex: 't3Unfinished',
+            key: 't3Unfinished',
+            width: 100,
+        },
+        {
+            title: '计划数',
+            dataIndex: 'totalPlanned',
+            key: 'totalPlanned',
+            width: 100,
+        },
+        {
+            title: '检验数',
+            dataIndex: 'totalInspected',
+            key: 'totalInspected',
+            width: 100,
+        },
+        {
+            title: '未完成数',
+            dataIndex: 'totalUnfinished',
+            key: 'totalUnfinished',
+            width: 100,
+        },
+        {
+            title: '达成率',
+            dataIndex: 'achievementRate',
+            key: 'achievementRate',
+            width: 100,
+            customRender: ({ text }: { text: number }) => text ? `${text.toFixed(2)}%` : '0.00%',
+        },
+        {
+            title: '特殊物料备注',
+            dataIndex: 'specialNote',
+            key: 'specialNote',
+            width: 150,
         },
     ];
 
@@ -81,106 +181,26 @@ export const useProductionPlanData = () => {
         }
     };
 
-    const loadProductModels = async () => {
-        try {
-            const response = await getProductModels({ pageSize: 100 });
-            productModels.value = response.data.data;
-        } catch (error: any) {
-            message.error(`Failed to load product models: ${error.response?.data?.error || error.message}`);
-        }
-    };
-
-    const loadDailyPlans = async () => {
-        try {
-            const today = dayjs().format('YYYY-MM-DD');
-            const response = await getProductionPlansByDateRange(today);
-            dailyPlansData.value = response.data.data;
-        } catch (error: any) {
-            message.error(`Failed to load daily plans: ${error.response?.data?.error || error.message}`);
-        }
-    };
-
-    const remove = async (id: number[]) => {
+    const handleImport = async (file: File) => {
         isLoading.value = true;
         try {
-            await deleteProductionPlan(id);
-            message.success('Production plan deleted successfully');
-            return true;
+            await importProductionPlan(file);
+            message.success('Production plan imported successfully');
+            await list(); // Refresh list
         } catch (error: any) {
-            message.error(`Failed to delete production plan: ${error.response?.data?.error || error.message}`);
-            return Promise.reject(error);
+            message.error(`Failed to import production plan: ${error.response?.data?.error || error.message}`);
         } finally {
             isLoading.value = false;
         }
     };
-
-    const create = async (productionPlan: ProductionPlan) => {
-        isLoading.value = true;
-        try {
-            const response = await addProductionPlan(productionPlan);
-            message.success('Production plan created successfully');
-            return response;
-        } catch (error: any) {
-            message.error(`Failed to create production plan: ${error.response?.data?.error || error.message}`);
-            return Promise.reject(error);
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const update = async (productionPlan: ProductionPlan) => {
-        isLoading.value = true;
-        try {
-            const response = await updateProductionPlan(productionPlan);
-            message.success('Production plan updated successfully');
-            return response;
-        } catch (error: any) {
-            message.error(`Failed to update production plan: ${error.response?.data?.error || error.message}`);
-            return Promise.reject(error);
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    // 计算T、T+1、T+2、T+3的计划数量
-    const dailyPlanCounts = computed(() => {
-        const today = dayjs();
-        const counts = [];
-
-        for (let i = 0; i < 4; i++) {
-            const targetDate = today.add(i, 'day');
-            const dayLabel = i === 0 ? 'T' : `T+${i}`;
-            const displayDate = targetDate.format('MM-DD');
-
-            // 从API返回的数据中获取对应日期的计划
-            const dayPlans = dailyPlansData.value[dayLabel] || [];
-            const planCount = dayPlans.reduce((sum: number, plan: ProductionPlan) => sum + plan.planned, 0);
-
-            counts.push({
-                date: targetDate.format('YYYY-MM-DD'),
-                dayLabel,
-                displayDate,
-                count: planCount,
-                hasPlans: planCount > 0
-            });
-        }
-
-        return counts;
-    });
 
     return {
         isLoading,
         data,
-        productModels,
         columns,
         pagination,
         searchKeyword,
-        dailyPlanCounts,
         list,
-        loadProductModels,
-        loadDailyPlans,
-        remove,
-        create,
-        update,
+        handleImport,
     };
 };

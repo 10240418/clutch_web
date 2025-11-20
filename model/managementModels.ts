@@ -21,14 +21,33 @@ export interface ProductModel {
 }
 
 export interface ProductionPlan {
-  id?: number;
-  startAt: string | Date; // 可以是字符串或日期类型
-  endAt: string | Date;
-  belongsTo: string;
-  productModelId: number | undefined;
-  productModel?: ProductModel; // 用于关联显示
-  planned: number;
-  actual: number | null;
+  id: number;
+  materialCode: string;
+  partNumber: string;
+  type: string;
+  manufacturer: string;
+  planDate: string;
+  productionLine: string;
+
+  tPlanned: number;
+  tActual: number;
+  tUnfinished: number;
+
+  t1Planned: number;
+  t1Actual: number;
+  t1Unfinished: number;
+
+  t2Planned: number;
+  t2Actual: number;
+  t2Unfinished: number;
+  t3Planned: number;
+  t3Actual: number;
+  t3Unfinished: number;
+  totalPlanned: number;
+  totalInspected: number;
+  totalUnfinished: number;
+  achievementRate: number;
+  specialNote: string;
 }
 
 export interface ProductLine {
