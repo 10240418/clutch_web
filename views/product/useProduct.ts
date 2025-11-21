@@ -157,7 +157,7 @@ export const useProductData = () => {
             // Client-side filtering to ensure only matching description products are shown
             if (searchKeyword.value) {
                 products = products.filter((product: Product) =>
-                    product.productModel?.description === searchKeyword.value
+                    product.productModel?.description?.includes(searchKeyword.value)
                 );
             }
 

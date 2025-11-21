@@ -21,7 +21,7 @@ export interface ProductModel {
 }
 
 export interface ProductionPlan {
-  id: number;
+  id?: number;
   materialCode: string;
   partNumber: string;
   type: string;

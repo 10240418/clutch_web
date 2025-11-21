@@ -61,6 +61,10 @@ export const getProductionPlans = (query?: object) => {
     return axiosInstance.get('/management/production_plan', { params: query });
 };
 
+export const getProductionPlansByDate = (date: string) => {
+    return axiosInstance.get('/management/production_plan/date', { params: { date } });
+};
+
 export const getProductionPlan = (id: number) => {
     return axiosInstance.get(`/management/production_plan/${id}`);
 };
@@ -73,14 +77,8 @@ export const getProductionPlansByDateRange = (date: string) => {
     return axiosInstance.get('/management/production_plan/date_range', { params: { date } });
 };
 
-export const importProductionPlan = (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return axiosInstance.post('/management/production_plan/import', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+export const importProductionPlan = (data: object[]) => {
+    return axiosInstance.post('/management/production_plan/import', { plans: data });
 };
 
 // Product Line APIs (Management)
