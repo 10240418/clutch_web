@@ -51,6 +51,11 @@ export const useProductData = () => {
             key: 'productModel',
         },
         {
+            title: '物料编码',
+            dataIndex: ['productModel', 'sn'],
+            key: 'materialCode',
+        },
+        {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
@@ -130,8 +135,8 @@ export const useProductData = () => {
             pageSize: pagination.value.pageSize,
         };
 
-        // If no search keyword, do not load data
-        if (!searchKeyword.value) {
+        // If no search keyword and no other filters, do not load data
+        if (!searchKeyword.value && !selectedProductLineId.value && (!dateRange.value || dateRange.value.length === 0) && hasDefect.value === undefined) {
             data.value = [];
             pagination.value.total = 0;
             isLoading.value = false;

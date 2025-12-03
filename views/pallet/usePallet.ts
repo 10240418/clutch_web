@@ -21,6 +21,11 @@ export const usePalletData = () => {
             key: 'productModel',
         },
         {
+            title: '物料编码',
+            dataIndex: ['productModel', 'sn'],
+            key: 'materialCode',
+        },
+        {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',

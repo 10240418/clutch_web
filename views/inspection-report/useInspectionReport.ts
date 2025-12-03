@@ -47,7 +47,8 @@ export const useInspectionReportData = () => {
   const columns = [
     { title: '供应商', dataIndex: 'supplierName', key: 'supplierName' },
     { title: '产品型号', dataIndex: 'description', key: 'description' },
-    { title: '物料编码/批次号', dataIndex: 'productModelSN', key: 'productModelSN' },
+    { title: '物料编码', dataIndex: 'productModelSN', key: 'productModelSN' },
+    { title: '批次号', dataIndex: 'batchNumber', key: 'batchNumber' },
     { title: '产线', dataIndex: 'productLine', key: 'productLine' },
     { title: '检测总数', dataIndex: 'inspectionCount', key: 'inspectionCount' },
     { title: '合格数', dataIndex: 'qualifiedCount', key: 'qualifiedCount' },
@@ -133,7 +134,8 @@ export const useInspectionReportData = () => {
       const worksheet = workbook.addWorksheet('全检报表');
 
       worksheet.columns = [
-        { width: 25 }, // 物料编码/批次号
+        { width: 20 }, // 物料编码
+        { width: 15 }, // 批次号
         { width: 20 }, // 产品型号
         { width: 15 }, // 产线
         { width: 12 }, // 检验数量
@@ -148,19 +150,16 @@ export const useInspectionReportData = () => {
       const unqualifiedTotal = allData.reduce((sum, r) => sum + (r.unqualifiedCount || 0), 0);
       const currentDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-      worksheet.addRow(['检验总数:', `${totalCount}`, '', '', '', '', '']);
-      worksheet.addRow(['合格/不合格:', `${qualifiedTotal} / ${unqualifiedTotal}`, '', '', '', '', '']);
-      worksheet.addRow(['导出日期:', currentDate, '', '', '', '', '']);
-      worksheet.addRow(['', '', '', '', '', '', '']);
-      worksheet.addRow(['物料编码/批次号', '产品型号', '产线', '检验数量', '合格数', '不合格数', '供应商', '检验日期']);
+      worksheet.addRow(['检验总数:', `${totalCount}`, '', '', '', '', '', '']);
+      worksheet.addRow(['合格/不合格:', `${qualifiedTotal} / ${unqualifiedTotal}`, '', '', '', '', '', '']);
+      worksheet.addRow(['导出日期:', currentDate, '', '', '', '', '', '']);
+      worksheet.addRow(['', '', '', '', '', '', '', '']);
+      worksheet.addRow(['物料编码', '批次号', '产品型号', '产线', '检验数量', '合格数', '不合格数', '供应商', '检验日期']);
 
       allData.forEach(item => {
-        const productAndBatch = item.productModelSN
-          ? item.productModelSN + (item.batchNumber ? `/${item.batchNumber}` : '')
-          : (item.batchNumber || '');
-
         worksheet.addRow([
-          productAndBatch,
+          item.productModelSN || '',
+          item.batchNumber || '',
           item.description || '',
           item.productLine || '',
           item.inspectionCount ?? 0,
@@ -181,7 +180,7 @@ export const useInspectionReportData = () => {
             cell.alignment = { vertical: 'middle', horizontal: col === 1 ? 'right' : 'left' };
           }
         });
-        worksheet.mergeCells(`B${i}:G${i}`);
+        worksheet.mergeCells(`B${i}:H${i}`);
       }
 
       // Header row style (row 5)
