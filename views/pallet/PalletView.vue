@@ -30,7 +30,7 @@ list();
 <template>
     <div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-            <a-input-search v-model:value="searchKeyword" placeholder="按SN搜索" style="width: 300px;"
+            <a-input-search v-model:value="searchKeyword" placeholder="按托盘SN或电机SN搜索" style="width: 300px;"
                 @search="onSearch" />
         </div>
 

@@ -10,7 +10,7 @@ interface ProductQueryParams {
     pageSize: number;
     startTime?: string;
     endTime?: string;
-    description?: string;
+    description?: string;  // 同时模糊查询产品型号描述和电机SN
     productLineId?: number;
     hasDefect?: boolean;
     defectReason?: string;
@@ -157,14 +157,7 @@ export const useProductData = () => {
 
         try {
             const response = await getProducts(query);
-            let products = response.data.data;
-
-            // Client-side filtering to ensure only matching description products are shown
-            if (searchKeyword.value) {
-                products = products.filter((product: Product) =>
-                    product.productModel?.description?.includes(searchKeyword.value)
-                );
-            }
+            const products = response.data.data;
 
             data.value = products;
             pagination.value.total = response.data.pagination.total;

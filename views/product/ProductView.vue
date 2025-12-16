@@ -85,8 +85,8 @@ onMounted(async () => {
         </a-select>
         <a-input
           v-model:value="searchKeyword"
-          placeholder="输入产品型号进行查询"
-          style="width: 200px;"
+          placeholder="输入产品型号或电机SN查询"
+          style="width: 240px;"
           allowClear
           @pressEnter="handleSearch"
         />
